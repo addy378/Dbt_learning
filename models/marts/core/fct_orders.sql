@@ -6,6 +6,10 @@ order_item_summary as (
     select * from {{ ref('int_order_items_summed') }}
 ),
 
+priority_labels as (
+    select * from {{ ref('order_priority_labels') }}
+),
+
 final as (
     select
         orders.order_key,
@@ -13,6 +17,8 @@ final as (
         orders.order_status,
         orders.order_date,
         orders.order_priority,
+        priority_labels.priority_label,
+        priority_labels.priority_rank,
         orders.clerk_name,
         orders.ship_priority,
         order_item_summary.total_quantity,
@@ -21,6 +27,8 @@ final as (
     from orders
     left join order_item_summary
         on orders.order_key = order_item_summary.order_key
+    left join priority_labels
+        on orders.order_priority = priority_labels.order_priority
 )
 
 select * from final
